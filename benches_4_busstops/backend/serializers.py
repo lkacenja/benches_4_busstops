@@ -1,11 +1,9 @@
 from rest_framework import serializers
 
-from backend.models import Route, Stop
-
-from drf_dynamic_fields import DynamicFieldsMixin
+from backend.models import Route, Stop, Recording
 
 
-class RouteSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+class RouteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Route
         fields = ('rtd_route_id', 'rtd_route_long_name', 'rtd_stop_sequence', 'direction', 'stop')
@@ -20,4 +18,11 @@ class DistinctRouteSerializer(serializers.ModelSerializer):
 class DistinctStopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stop
-        fields = ['rtd_stop_name']
+        fields = ['rtd_stop_name', 'coords']
+
+
+class RecordingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recording
+        fields = ['has_bench', 'stop']
+

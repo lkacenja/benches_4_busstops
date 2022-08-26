@@ -1,18 +1,12 @@
-FROM alpine:latest
+FROM ubuntu:latest
+ENV TZ=US/Mountain
 ENV PGDATA=/var/lib/postgresql/data
-RUN apk update &&\
-  apk add --no-cache py3-pip postgresql &&\
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &&\
+  apt-get update -y &&\
+  apt-get install python3-pip systemd postgresql postgresql-contrib postgis -y &&\
   pip3 install django psycopg2-binary djangorestframework markdown django-filter &&\
-  mkdir /var/lib/postgresql/data &&\
-  chown -R postgres /var/lib/postgresql/data &&\
-  chmod 0700 /var/lib/postgresql/data &&\
-  mkdir /run/postgresql &&\
-  chown -R postgres /run/postgresql &&\
-  chmod 0700 /run/postgresql
 USER postgres
-RUN initdb /var/lib/postgresql/data &&\
-  echo "host all  all    0.0.0.0/0  md5" >> /var/lib/postgresql/data/pg_hba.conf &&\
-  echo "listen_addresses='*'" >> /var/lib/postgresql/data/postgresql.conf &&\
-  pg_ctl start -D /var/lib/postgresql/data &&\
+RUN service postgresql start &&\
+  psql -U postgres -c 'CREATE EXTENSION postgis;' &&\
   psql -U postgres -c 'create database busstops;'
 USER root

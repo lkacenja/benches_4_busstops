@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     'rest_framework',
     'backend',
 ]
@@ -77,12 +78,12 @@ WSGI_APPLICATION = 'benches_4_busstops.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'busstops',
         'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        # 'PASSWORD': '12345*',
+        # 'HOST': '127.0.0.1',
+        # 'PORT': '5432',
     }
 }
 

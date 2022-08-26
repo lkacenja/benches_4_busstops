@@ -1,6 +1,6 @@
 import csv
 from django.core.management import BaseCommand
-from django.utils import timezone
+from django.contrib.gis.geos import GEOSGeometry
 
 from backend.models import Stop
 from backend.models import Route
@@ -26,7 +26,8 @@ class Command(BaseCommand):
                 row = dict(zip(header, row))
                 if row['stop_name'] not in stops:
                     stops[row['stop_name']] = Stop.objects.create(
-                        rtd_stop_name=row['stop_name']
+                        rtd_stop_name=row['stop_name'],
+                        coords=GEOSGeometry('POINT(' + row['stop_lat'] + ' ' + row['stop_lon'] + ')')
                     )
                 route = Route(
                     rtd_route_id=row['route_id'],
