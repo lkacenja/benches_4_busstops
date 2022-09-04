@@ -3,10 +3,13 @@
 <html lang="">
     <head>
         <title>Benches 4 Bus Stops</title>
-        <link rel="icon" type="image/png" href="{% static 'frontend/images/favicon.png' %}">
+        <link rel="icon" type="image/png" href="{% static 'frontend/dist/images/favicon.png' %}">
+        <link rel="stylesheet" href="{% static 'frontend/dist/css/main.css' %}">
     </head>
     <body>
         <div id="app-container"></div>
+        {{ secrets|json_script:"secrets" }}
+        <script src="{% static 'frontend/dist/js/bundle.js' %}"></script>
         <noscript>Your browser does not support JavaScript!</noscript>
     </body>
 </html>
