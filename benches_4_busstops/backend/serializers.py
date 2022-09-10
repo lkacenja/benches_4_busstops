@@ -3,7 +3,15 @@ from rest_framework import serializers
 from backend.models import Route, Stop, Recording
 
 
+class StopSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stop
+        fields = ['id', 'rtd_stop_name', 'coords']
+
+
 class RouteSerializer(serializers.ModelSerializer):
+    stop = StopSerializer(read_only=True)
+
     class Meta:
         model = Route
         fields = ('id', 'rtd_route_id', 'rtd_route_long_name', 'rtd_stop_sequence', 'direction', 'stop')

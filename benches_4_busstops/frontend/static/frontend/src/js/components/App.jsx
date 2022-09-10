@@ -1,14 +1,18 @@
 import React from "react";
 
-import HCaptcha from '@hcaptcha/react-hcaptcha';
-import Header from './Header'
-import FormStopOrRoute from './FormStopOrRoute'
-import {setCookie, getCookie} from "../utility/cookie";
-import {getDistinctLists} from "../utility/ajax";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
+import Header from "./Header";
+import FormStopOrRoute from "./FormStopOrRoute";
+import FormBench from "./FormBench";
+import FormDirection from "./FormDirection";
+import {getCookie, setCookie} from "../utility/cookie";
+import {getDistinctLists, getRouteStops} from "../utility/ajax";
 
 const APP_MODES = {
-  CAPTCHA: 'CAPTCHA',
-  FORM_STOP_OR_ROUTE: 'FORM_STOP_OR_ROUTE',
+  CAPTCHA: "CAPTCHA",
+  FORM_STOP_OR_ROUTE: "FORM_STOP_OR_ROUTE",
+  FORM_DIRECTION: "FORM_DIRECTION",
+  FORM_BENCH: "FORM_BENCH",
 }
 
 class App extends React.Component {
@@ -17,20 +21,23 @@ class App extends React.Component {
     super(props);
     let initialMode = getCookie("benchcaptcha") ? APP_MODES.FORM_STOP_OR_ROUTE : APP_MODES.CAPTCHA;
     this.state = {
-      secrets: JSON.parse(document.getElementById('secrets').textContent),
+      secrets: JSON.parse(document.getElementById("secrets").textContent),
       mode: initialMode,
       loading: false,
       distinctStops: [],
-      distinctRoutes: []
+      distinctRoutes: [],
+      rtdObject: {},
     };
+    this.handleMainSubmit = this.handleMainSubmit.bind(this);
   }
 
   componentDidMount() {
     this.getDistinctLists()
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate() {
     this.getDistinctLists()
+    this.getRouteStops()
   }
 
   render() {
@@ -49,19 +56,25 @@ class App extends React.Component {
     switch (this.state.mode) {
       case APP_MODES.CAPTCHA:
         return <HCaptcha
-          sitekey={this.state.secretes.hcaptcha_site_key}
+          sitekey={this.state.secrets.hcaptcha_site_key}
           onVerify={(token, ekey) => this.handleVerificationSuccess(token, ekey)}
         />
       case APP_MODES.FORM_STOP_OR_ROUTE:
         return <FormStopOrRoute
           distinctStops={this.state.distinctStops}
           distinctRoutes={this.state.distinctRoutes}
-          submitHandler={this.handleMainSubmit} />
+          submitHandler={this.handleMainSubmit}/>
+      case APP_MODES.FORM_DIRECTION:
+        return <FormDirection submitHandler={this.handleMainSubmit}/>
+      case APP_MODES.FORM_BENCH:
+        return <FormBench
+          apiKey={this.state.secrets.google_maps_api_key}
+          rtdObject={this.state.rtdObject} />
     }
   }
 
   handleVerificationSuccess(token, ekey) {
-    setCookie('benchcaptcha', ekey, 1)
+    setCookie("benchcaptcha", ekey, 1)
     this.setState({"mode": APP_MODES.FORM_STOP_OR_ROUTE});
   }
 
@@ -69,21 +82,67 @@ class App extends React.Component {
     if (this.state.mode !== APP_MODES.CAPTCHA
       && this.state.loading === false
       && (this.state.distinctStops.length === 0
-      || this.state.distinctRoutes.length === 0)
+        || this.state.distinctRoutes.length === 0)
     ) {
       this.setState({loading: true});
       getDistinctLists((routes, stops) => {
-            this.setState({loading: false, distinctStops: stops.data, distinctRoutes: routes.data})
+        this.setState({loading: false, distinctStops: stops, distinctRoutes: routes})
       });
     }
   }
 
-  handleMainSubmit(e) {
-    let form = e.target
-    console.log(form);
-    e.preventDefault();
+  handleMainSubmit(values) {
+    let rtdObject;
+    let mode;
+    switch (this.state.mode) {
+      case APP_MODES.FORM_STOP_OR_ROUTE:
+        rtdObject = {};
+        if (values.route) {
+          rtdObject.type = "route";
+          // todo why aren't we using pkey here?
+          rtdObject.value = this.state.distinctRoutes.find((item) => {
+            return item.rtd_route_id === values.route;
+          });
+          rtdObject.value.stops = [];
+          mode = APP_MODES.FORM_DIRECTION;
+        }
+        if (values.stop) {
+          rtdObject.type = "stop";
+          rtdObject.value = this.state.distinctStops.find((item) => {
+            return item.id === values.stop;
+          });
+          mode = APP_MODES.FORM_BENCH;
+        }
+        this.setState({rtdObject: rtdObject, mode: mode});
+        break;
 
+      case APP_MODES.FORM_DIRECTION:
+        rtdObject = Object.assign({}, this.state.rtdObject);
+        rtdObject.direction = values.direction;
+        this.setState({rtdObject: rtdObject, mode: APP_MODES.FORM_BENCH});
+        break;
+    }
   }
-};
+
+  getRouteStops() {
+    // @todo use const for type.
+    if (this.state.mode === APP_MODES.FORM_DIRECTION
+      && this.state.rtdObject.type === "route"
+      && this.state.rtdObject.value.stops.length === 0
+      && this.state.loading === false) {
+      this.setState({loading: true});
+      getRouteStops(this.state.rtdObject.value.rtd_route_id, (routes) => {
+        let rtdObject = Object.assign({}, this.state.rtdObject);
+        rtdObject.value.stops = [];
+        rtdObject.value.stops = routes.map((route) => {
+          let stop = Object.assign({}, route.stop);
+          stop.direction = route.direction;
+          return stop;
+        });
+        this.setState({rtdObject: rtdObject, loading: false});
+      });
+    }
+  }
+}
 
 export default App;

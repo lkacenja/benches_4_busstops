@@ -2,3 +2,18 @@
   width: 40%;
   margin: 1em auto;
 }
+
+.marker {
+  position: absolute;
+  top: -1.5em;
+  left: -1.5em;
+  width: 3em;
+  height: 3em;
+  background: url("../../dist/images/marker-inactive.svg") center center no-repeat;
+  background-size: contain;
+
+  &.active {
+    background: url("../../dist/images/marker-active.svg") center center no-repeat;
+    background-size: contain;
+  }
+}
