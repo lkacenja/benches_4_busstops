@@ -137,6 +137,7 @@ class App extends React.Component {
         rtdObject.value.stops = routes.map((route) => {
           let stop = Object.assign({}, route.stop);
           stop.direction = route.direction;
+          stop.rtd_stop_sequence = route.rtd_stop_sequence;
           return stop;
         });
         this.setState({rtdObject: rtdObject, loading: false});

@@ -7,7 +7,7 @@ class FormDirection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      direction: "outbound",
+      direction: "0",
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -21,9 +21,9 @@ class FormDirection extends React.Component {
           id="direction-outbound"
           name="direction"
           label="Outbound"
-          value="outbound"
+          value="0"
           labelDescription="Away from the bus station"
-          checked={this.state.direction === "outbound"}
+          checked={this.state.direction === "0"}
           tile
           onChange={this.handleChange}
         />
@@ -31,9 +31,9 @@ class FormDirection extends React.Component {
           id="direction-inbound"
           name="direction"
           label="Inbound"
-          value="inbound"
+          value="1"
           labelDescription="Toward the bus station"
-          checked={this.state.direction === "inbound"}
+          checked={this.state.direction === "1"}
           tile
           onChange={this.handleChange}
         />

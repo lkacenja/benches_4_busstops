@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from 'prop-types';
 import GoogleMapReact from "google-map-react";
 
-import {Form, Radio, Button} from "@trussworks/react-uswds";
+import {Form, Radio, Button, ButtonGroup, Link} from "@trussworks/react-uswds";
 import Marker from "./Marker";
 
 class FormBench extends React.Component {
@@ -10,23 +10,25 @@ class FormBench extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentStop: false,
-      bench: false,
+      currentStopSequence: 1,
+      benches: {},
     };
     this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleActionClick = this.handleActionClick.bind(this);
   }
 
   render() {
-    let activeStop = this.getActiveStop()
+    let activeStop = this.getActiveStop(this.state.currentStopSequence);
     // todo use css for map dimensions.
     return (
-      <Form>
+      <Form onSubmit={this.handleSubmit}>
         {this.getTitle(activeStop)}
         <div style={{height: "150px", width: "100%"}}>
           <GoogleMapReact
             bootstrapURLKeys={{key: this.props.apiKey}}
-            defaultCenter={this.parseCoords(activeStop.coords)}
-            defaultZoom={17}
+            center={this.parseCoords(activeStop.coords)}
+            defaultZoom={15}
           >
             {this.getMarkers()}
           </GoogleMapReact>
@@ -36,7 +38,7 @@ class FormBench extends React.Component {
             label="Yes"
             value={"yes"}
             labelDescription="I see a bench."
-            checked={this.state.bench === "yes"}
+            checked={this.state.benches[activeStop.id] === "yes"}
             tile
             onChange={this.handleChange}
           />
@@ -46,32 +48,48 @@ class FormBench extends React.Component {
             label="No"
             value={"no"}
             labelDescription="I do not see a bench."
-            checked={this.state.bench === "no"}
+            checked={this.state.benches[activeStop.id] === "no"}
             tile
             onChange={this.handleChange}
           />
-          <Button type="submit">Submit</Button>
+          <Radio
+            id="bench-unknown"
+            name="bench"
+            label="Unknown"
+            value={"unknown"}
+            labelDescription="I'm not sure."
+            checked={!this.state.benches[activeStop.id] || this.state.benches[activeStop.id] === "unknown"}
+            tile
+            onChange={this.handleChange}
+          />
+          {this.getActions()}
         </div>
       </Form>
     );
   }
 
-  getActiveStop() {
+  getActiveStop(sequence) {
     let currentStop;
     if (this.props.rtdObject.type === "stop") {
       currentStop = this.props.rtdObject.value;
     }
     if (this.props.rtdObject.type === "route") {
-      console.log(this.props.rtdObject);
-      currentStop = this.props.rtdObject.value.stops[0];
+      currentStop = this.getStopAtSequence(sequence);
     }
     return currentStop;
+  }
+
+  getStopAtSequence(sequence) {
+    return this.props.rtdObject.value.stops.find((stop) => {
+      return stop.direction === this.props.rtdObject.direction
+        && sequence === stop.rtd_stop_sequence;
+    });
   }
 
   getTitle(activeStop) {
     let title;
     if (this.props.rtdObject.type === "stop") {
-      title = <h2>activeStop.rtd_stop_name</h2>;
+      title = <h2>{activeStop.rtd_stop_name}</h2>;
     }
     if (this.props.rtdObject.type === "route") {
       title = (
@@ -95,14 +113,64 @@ class FormBench extends React.Component {
     }
     if (this.props.rtdObject.type === "route") {
       this.props.rtdObject.value.stops.forEach((stop, index) => {
-        coords = this.parseCoords(stop.coords)
-        markers.push(<Marker key={index}
-                             lat={coords.lat}
-                             lng={coords.lng}
-                             active={index === 0}/>);
+        if (stop.direction == this.props.rtdObject.direction) {
+          coords = this.parseCoords(stop.coords)
+          markers.push(<Marker key={index}
+                               lat={coords.lat}
+                               lng={coords.lng}
+                               active={stop.rtd_stop_sequence === this.state.currentStopSequence}/>);
+        }
       });
     }
     return markers;
+  }
+
+  getActions() {
+    let actions = [];
+    if (this.props.rtdObject.type === "stop") {
+      actions.push(<Button
+        id="submit-done"
+        key="submit-done"
+        type="submit"
+        onClick={this.handleActionClick}
+      >
+        Done
+      </Button>);
+    }
+    if (this.props.rtdObject.type === "route") {
+      let prevStopExists = !!(this.getStopAtSequence(this.state.currentStopSequence - 1));
+      let nextStopExists = !!(this.getStopAtSequence(this.state.currentStopSequence + 1));
+      actions.push(<ButtonGroup key="actions" type="default">
+        <Button
+          id="submit-prev"
+          key="submit-prev"
+          type="button"
+          className="usa-button usa-button--outline"
+          onClick={this.handleActionClick}
+          disabled={!prevStopExists}
+        >
+          { prevStopExists ? "Previous Stop" : "No Previous Stop" }
+        </Button>
+        <Button
+          id="submit"
+          key="submit-continue"
+          type="submit"
+          onClick={this.handleActionClick}
+          disabled={!nextStopExists}
+        >
+          { nextStopExists ? "Next Stop" : "No Next Stop" }
+        </Button>
+        <Button
+          id="submit-done"
+          key="submit-done"
+          type="submit"
+          onClick={this.handleActionClick}
+        >
+          Done
+        </Button>
+      </ButtonGroup>);
+    }
+    return actions;
   }
 
   parseCoords(stringCoords) {
@@ -116,7 +184,33 @@ class FormBench extends React.Component {
   }
 
   handleChange(e) {
-    this.setState({bench: e.target.value});
+    let currentStop = this.getActiveStop(this.state.currentStopSequence);
+    let benches = Object.assign({}, this.state.benches);
+    benches[currentStop.id] = e.target.value;
+    this.setState({benches: benches});
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+  }
+
+  handleActionClick(e) {
+    e.preventDefault();
+    if (e.target.disabled) {
+      return;
+    }
+    //let activeStop = this.getActiveStop(this.state.currentStopSequence);
+    switch(e.target.id) {
+      case "submit":
+        this.setState({"currentStopSequence": this.state.currentStopSequence + 1});
+        break;
+      case "submit-prev":
+        this.setState({"currentStopSequence": this.state.currentStopSequence - 1});
+        break;
+      case "submit-done":
+        // Send off values
+        break;
+    }
   }
 }
 
@@ -129,8 +223,8 @@ FormBench.defaultProps = {
 };
 
 FormBench.propTypes = {
-  apiKey: PropTypes.string.required,
-  rtdObject: PropTypes.object.required,
+  apiKey: PropTypes.string.isRequired,
+  rtdObject: PropTypes.object.isRequired,
 }
 
 export default FormBench;
