@@ -5,14 +5,16 @@ import Header from "./Header";
 import FormStopOrRoute from "./FormStopOrRoute";
 import FormBench from "./FormBench";
 import FormDirection from "./FormDirection";
+import CompletionPage from "./CompletionPage";
 import {getCookie, setCookie} from "../utility/cookie";
-import {getDistinctLists, getRouteStops} from "../utility/ajax";
+import {getDistinctLists, getRouteStops, postRecordings} from "../utility/ajax";
 
 const APP_MODES = {
   CAPTCHA: "CAPTCHA",
   FORM_STOP_OR_ROUTE: "FORM_STOP_OR_ROUTE",
   FORM_DIRECTION: "FORM_DIRECTION",
   FORM_BENCH: "FORM_BENCH",
+  COMPLETION_PAGE: "COMPLETION_PAGE",
 }
 
 class App extends React.Component {
@@ -32,12 +34,12 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    this.getDistinctLists()
+    this.getDistinctLists();
   }
 
   componentDidUpdate() {
-    this.getDistinctLists()
-    this.getRouteStops()
+    this.getDistinctLists();
+    this.getRouteStops();
   }
 
   render() {
@@ -69,11 +71,15 @@ class App extends React.Component {
       case APP_MODES.FORM_BENCH:
         return <FormBench
           apiKey={this.state.secrets.google_maps_api_key}
-          rtdObject={this.state.rtdObject} />
+          rtdObject={this.state.rtdObject}
+          submitHandler={this.handleMainSubmit}/>
+      case APP_MODES.COMPLETION_PAGE:
+        return <CompletionPage />
     }
   }
 
   handleVerificationSuccess(token, ekey) {
+    // @todo use a const for this.
     setCookie("benchcaptcha", ekey, 1)
     this.setState({"mode": APP_MODES.FORM_STOP_OR_ROUTE});
   }
@@ -121,6 +127,21 @@ class App extends React.Component {
         rtdObject.direction = values.direction;
         this.setState({rtdObject: rtdObject, mode: APP_MODES.FORM_BENCH});
         break;
+      case APP_MODES.FORM_BENCH:
+        this.postRecordings(values);
+        break;
+    }
+  }
+
+  postRecordings(values) {
+    if (values.length > 0) {
+      this.setState({loading: true});
+      postRecordings(values, () => {
+        this.setState({loading: false, mode: APP_MODES.COMPLETION_PAGE})
+      });
+    }
+    else {
+      this.setState({mode: APP_MODES.COMPLETION_PAGE});
     }
   }
 

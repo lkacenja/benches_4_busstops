@@ -15,7 +15,7 @@ export function getDistinctLists(callback) {
     .then(axios.spread((routes, stops) => {
       callback(routes.data, stops.data);
     }))
-    .catch(function (error) {
+    .catch((error) => {
       console.log(error);
     });
 }
@@ -25,7 +25,17 @@ export function getRouteStops(routeId, callback) {
     .then((routes) => {
       callback(routes.data);
     })
-    .catch(function (error) {
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+export function postRecordings(recordings, callback) {
+  axios.post(RESOURCES.RECORDING_CREATE, recordings)
+    .then(() => {
+      callback()
+    })
+    .catch((error) => {
       console.log(error);
     });
 }

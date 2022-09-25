@@ -2,8 +2,9 @@ import React from "react";
 import PropTypes from 'prop-types';
 import GoogleMapReact from "google-map-react";
 
-import {Form, Radio, Button, ButtonGroup, Link} from "@trussworks/react-uswds";
+import {Form, Radio, Button, ButtonGroup} from "@trussworks/react-uswds";
 import Marker from "./Marker";
+import {getCookie} from "../utility/cookie";
 
 class FormBench extends React.Component {
 
@@ -113,7 +114,7 @@ class FormBench extends React.Component {
     }
     if (this.props.rtdObject.type === "route") {
       this.props.rtdObject.value.stops.forEach((stop, index) => {
-        if (stop.direction == this.props.rtdObject.direction) {
+        if (stop.direction === this.props.rtdObject.direction) {
           coords = this.parseCoords(stop.coords)
           markers.push(<Marker key={index}
                                lat={coords.lat}
@@ -149,7 +150,7 @@ class FormBench extends React.Component {
           onClick={this.handleActionClick}
           disabled={!prevStopExists}
         >
-          { prevStopExists ? "Previous Stop" : "No Previous Stop" }
+          {prevStopExists ? "Previous Stop" : "No Previous Stop"}
         </Button>
         <Button
           id="submit"
@@ -158,7 +159,7 @@ class FormBench extends React.Component {
           onClick={this.handleActionClick}
           disabled={!nextStopExists}
         >
-          { nextStopExists ? "Next Stop" : "No Next Stop" }
+          {nextStopExists ? "Next Stop" : "No Next Stop"}
         </Button>
         <Button
           id="submit-done"
@@ -199,8 +200,8 @@ class FormBench extends React.Component {
     if (e.target.disabled) {
       return;
     }
-    //let activeStop = this.getActiveStop(this.state.currentStopSequence);
-    switch(e.target.id) {
+    let values;
+    switch (e.target.id) {
       case "submit":
         this.setState({"currentStopSequence": this.state.currentStopSequence + 1});
         break;
@@ -208,9 +209,27 @@ class FormBench extends React.Component {
         this.setState({"currentStopSequence": this.state.currentStopSequence - 1});
         break;
       case "submit-done":
-        // Send off values
+        values = this.massageValues();
+        this.props.submitHandler(values);
         break;
     }
+  }
+
+  massageValues() {
+    let values = [];
+    let userId = getCookie("benchcaptcha").slice(0, 30);
+    // @todo what if this is not set anymore?
+    // Maybe we reload the page if it's not found, starting app over.
+    for (let stopId in this.state.benches) {
+      if (this.state.benches[stopId] !== "unknown") {
+        values.push({
+          "user_id": userId,
+          "stop": stopId,
+          "has_bench": this.state.benches[stopId] === "yes" ? 1 : 0,
+        })
+      }
+    }
+    return values;
   }
 }
 
@@ -225,6 +244,7 @@ FormBench.defaultProps = {
 FormBench.propTypes = {
   apiKey: PropTypes.string.isRequired,
   rtdObject: PropTypes.object.isRequired,
+  submitHandler: PropTypes.func.isRequired,
 }
 
 export default FormBench;
