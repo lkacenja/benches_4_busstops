@@ -17,4 +17,5 @@ class Route(models.Model):
 class Recording(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     has_bench = models.BooleanField()
+    user_id = models.CharField(max_length=255)
     stop = models.ForeignKey(to=Stop, on_delete=models.CASCADE, related_name='recording_stop')

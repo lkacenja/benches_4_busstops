@@ -32,5 +32,5 @@ class DistinctStopSerializer(serializers.ModelSerializer):
 class RecordingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recording
-        fields = ['has_bench', 'stop']
+        fields = ['user_id', 'has_bench', 'stop']
 
