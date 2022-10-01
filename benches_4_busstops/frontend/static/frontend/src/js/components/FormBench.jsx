@@ -11,7 +11,7 @@ class FormBench extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentStopSequence: 1,
+      currentStopSequence: this.getInitialSequence(props.closestStop),
       benches: {},
     };
     this.handleChange = this.handleChange.bind(this);
@@ -231,6 +231,16 @@ class FormBench extends React.Component {
     }
     return values;
   }
+
+  getInitialSequence(closestStop) {
+    if (closestStop.id && this.props.rtdObject.type === "route") {
+      let fullStop = this.props.rtdObject.value.stops.find((stop) => {
+        return stop.id === closestStop.id;
+      });
+      return fullStop ? fullStop.rtd_stop_sequence : 1;
+    }
+    return 1;
+  }
 }
 
 FormBench.defaultProps = {
@@ -239,11 +249,13 @@ FormBench.defaultProps = {
     type: "",
     value: {},
   },
+  closestStop: {},
 };
 
 FormBench.propTypes = {
   apiKey: PropTypes.string.isRequired,
   rtdObject: PropTypes.object.isRequired,
+  closestStop: PropTypes.object.isRequired,
   submitHandler: PropTypes.func.isRequired,
 }
 

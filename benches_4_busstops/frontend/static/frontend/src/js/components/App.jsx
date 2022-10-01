@@ -6,6 +6,7 @@ import FormStopOrRoute from "./FormStopOrRoute";
 import FormBench from "./FormBench";
 import FormDirection from "./FormDirection";
 import CompletionPage from "./CompletionPage";
+import Footer from "./Footer";
 import {getCookie, setCookie} from "../utility/cookie";
 import {getDistinctLists, getRouteStops, postRecordings} from "../utility/ajax";
 
@@ -26,9 +27,12 @@ class App extends React.Component {
       secrets: JSON.parse(document.getElementById("secrets").textContent),
       mode: initialMode,
       loading: false,
+      locationRequested: false,
+      userLocation: '',
       distinctStops: [],
       distinctRoutes: [],
       rtdObject: {},
+      closestStop: {},
     };
     this.handleMainSubmit = this.handleMainSubmit.bind(this);
   }
@@ -39,7 +43,6 @@ class App extends React.Component {
 
   componentDidUpdate() {
     this.getDistinctLists();
-    this.getRouteStops();
   }
 
   render() {
@@ -47,6 +50,7 @@ class App extends React.Component {
       <div className="header">
         <Header/>
         {this.getMainComponent()}
+        <Footer/>
       </div>
     )
   }
@@ -72,6 +76,7 @@ class App extends React.Component {
         return <FormBench
           apiKey={this.state.secrets.google_maps_api_key}
           rtdObject={this.state.rtdObject}
+          closestStop={this.state.closestStop}
           submitHandler={this.handleMainSubmit}/>
       case APP_MODES.COMPLETION_PAGE:
         return <CompletionPage />
@@ -125,7 +130,17 @@ class App extends React.Component {
       case APP_MODES.FORM_DIRECTION:
         rtdObject = Object.assign({}, this.state.rtdObject);
         rtdObject.direction = values.direction;
-        this.setState({rtdObject: rtdObject, mode: APP_MODES.FORM_BENCH});
+        this.setState({loading: true});
+        getRouteStops(this.state.rtdObject.value.rtd_route_id, rtdObject.direction, (routes, closestStop) => {
+          rtdObject.value.stops = [];
+          rtdObject.value.stops = routes.map((route) => {
+            let stop = Object.assign({}, route.stop);
+            stop.direction = route.direction;
+            stop.rtd_stop_sequence = route.rtd_stop_sequence;
+            return stop;
+          });
+          this.setState({rtdObject: rtdObject, closestStop: closestStop ? closestStop[0] : false, loading: false, mode: APP_MODES.FORM_BENCH});
+        });
         break;
       case APP_MODES.FORM_BENCH:
         this.postRecordings(values);
@@ -145,14 +160,14 @@ class App extends React.Component {
     }
   }
 
-  getRouteStops() {
+  getRouteStops(callback) {
     // @todo use const for type.
-    if (this.state.mode === APP_MODES.FORM_DIRECTION
+    if (this.state.mode === APP_MODES.FORM_BENCH
       && this.state.rtdObject.type === "route"
       && this.state.rtdObject.value.stops.length === 0
       && this.state.loading === false) {
       this.setState({loading: true});
-      getRouteStops(this.state.rtdObject.value.rtd_route_id, (routes) => {
+      getRouteStops(this.state.rtdObject.value.rtd_route_id, (routes, closestStop) => {
         let rtdObject = Object.assign({}, this.state.rtdObject);
         rtdObject.value.stops = [];
         rtdObject.value.stops = routes.map((route) => {
@@ -161,10 +176,11 @@ class App extends React.Component {
           stop.rtd_stop_sequence = route.rtd_stop_sequence;
           return stop;
         });
-        this.setState({rtdObject: rtdObject, loading: false});
+        this.setState({rtdObject: rtdObject, closestStop: closestStop ? closestStop[0] : false, loading: false});
       });
     }
   }
+
 }
 
 export default App;
