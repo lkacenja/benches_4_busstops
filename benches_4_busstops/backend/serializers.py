@@ -4,13 +4,9 @@ from backend.models import Route, Stop, Recording
 
 
 class StopSerializer(serializers.ModelSerializer):
-    distance = serializers.SerializerMethodField()
-
-    def get_distance(self, obj):
-        return obj.distance.m
     class Meta:
         model = Stop
-        fields = ['id', 'rtd_stop_name', 'coords', 'distance']
+        fields = ['id', 'rtd_stop_name', 'coords', ]
 
 
 class RouteSerializer(serializers.ModelSerializer):
