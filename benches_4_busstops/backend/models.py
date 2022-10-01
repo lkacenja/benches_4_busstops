@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 
 class Stop(models.Model):
     rtd_stop_name = models.CharField(max_length=255)
-    coords = models.PointField(geography=False)
+    coords = models.PointField(geography=False, srid=900913)
 
 
 

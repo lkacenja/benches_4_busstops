@@ -27,7 +27,7 @@ class Command(BaseCommand):
                 if row['stop_name'] not in stops:
                     stops[row['stop_name']] = Stop.objects.create(
                         rtd_stop_name=row['stop_name'],
-                        coords=GEOSGeometry('POINT(' + row['stop_lat'] + ' ' + row['stop_lon'] + ')')
+                        coords=GEOSGeometry('POINT(' + row['stop_lat'] + ' ' + row['stop_lon'] + ')', srid=900913)
                     )
                 route = Route(
                     rtd_route_id=row['route_id'],
