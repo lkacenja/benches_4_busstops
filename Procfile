@@ -1,1 +1,1 @@
-web: gunicorn --chdir=./benches_4_busstops benches_4_busstops.wsgi
+web: gunicorn benches_4_busstops.wsgi --log-file -
