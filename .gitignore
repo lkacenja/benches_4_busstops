@@ -10,7 +10,6 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
 downloads/
 eggs/
 .eggs/
@@ -135,4 +134,4 @@ dmypy.json
 node_modules
 
 .DS_Store
-static
+staticfiles
