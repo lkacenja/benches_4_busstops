@@ -25,7 +25,7 @@ class FormBench extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit}>
         {this.getTitle(activeStop)}
-        <div style={{height: "150px", width: "100%"}}>
+        <div className="map-wrapper">
           <GoogleMapReact
             bootstrapURLKeys={{key: this.props.apiKey}}
             center={this.parseCoords(activeStop.coords)}
@@ -33,6 +33,8 @@ class FormBench extends React.Component {
           >
             {this.getMarkers()}
           </GoogleMapReact>
+        </div>
+        <div className="margin-bottom-3">
           <Radio
             id="bench-yes"
             name="bench"
@@ -63,10 +65,13 @@ class FormBench extends React.Component {
             tile
             onChange={this.handleChange}
           />
-          {this.getActions()}
         </div>
+        {
+          this.getActions()
+        }
       </Form>
-    );
+    )
+      ;
   }
 
   getActiveStop(sequence) {
@@ -96,7 +101,7 @@ class FormBench extends React.Component {
       title = (
         <div className="title">
           <h2>{`${this.props.rtdObject.value.rtd_route_long_name} (${this.props.rtdObject.value.rtd_route_id})`}</h2>
-          <strong>{"Current Stop: " + activeStop.rtd_stop_name}</strong>
+          <strong className="display-block margin-bottom-2">{"Current Stop: " + activeStop.rtd_stop_name}</strong>
         </div>
       );
     }

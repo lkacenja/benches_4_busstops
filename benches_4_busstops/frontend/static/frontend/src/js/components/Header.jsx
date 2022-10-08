@@ -3,10 +3,12 @@ import React from "react";
 class Header extends React.Component {
     render() {
         return (
-            <div className="header">
-                <h1>Benches 4 Bus Stops</h1>
-                <img src="/static/frontend/dist/images/logo.svg" alt="Logo with bus, phone and bench illustrations."/>
+          <div className="header grid-container padding-x-0">
+            <div className="header grid-row grid-gap">
+                <img className="grid-col-4" src="/static/frontend/dist/images/logo.svg" alt="Logo with bus, phone and bench illustrations."/>
+                <h1 className="grid-col-8">Benches 4 Bus Stops</h1>
             </div>
+          </div>
         )
     }
 }

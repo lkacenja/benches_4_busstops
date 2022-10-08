@@ -41,7 +41,7 @@ class FormStopOrRoute extends React.Component {
           />
         </FormGroup>
         <p>Or select a single bus stop.</p>
-        <FormGroup error={!!this.state.errors.stops}>
+        <FormGroup error={!!this.state.errors.stops} className="margin-bottom-3">
           <Label htmlFor="distinct-stops">Select a RTD bus stop</Label>
           {!!this.state.errors.stops &&
             <ErrorMessage id="distinct-stops">

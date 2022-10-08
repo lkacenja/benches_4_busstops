@@ -47,10 +47,14 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className="header">
-        <Header/>
-        {this.getMainComponent()}
-        <Footer/>
+      <div className="grid-row">
+        <div className="inside-app grid-col desktop:grid-col-6 mobile-lg:grid-col-8 margin-x-auto">
+          <Header/>
+          <div className="main-component margin-y-3">
+            {this.getMainComponent()}
+          </div>
+          <Footer/>
+        </div>
       </div>
     )
   }
@@ -79,7 +83,7 @@ class App extends React.Component {
           closestStop={this.state.closestStop}
           submitHandler={this.handleMainSubmit}/>
       case APP_MODES.COMPLETION_PAGE:
-        return <CompletionPage />
+        return <CompletionPage/>
     }
   }
 
@@ -139,7 +143,12 @@ class App extends React.Component {
             stop.rtd_stop_sequence = route.rtd_stop_sequence;
             return stop;
           });
-          this.setState({rtdObject: rtdObject, closestStop: closestStop ? closestStop[0] : false, loading: false, mode: APP_MODES.FORM_BENCH});
+          this.setState({
+            rtdObject: rtdObject,
+            closestStop: closestStop ? closestStop[0] : false,
+            loading: false,
+            mode: APP_MODES.FORM_BENCH
+          });
         });
         break;
       case APP_MODES.FORM_BENCH:
@@ -154,8 +163,7 @@ class App extends React.Component {
       postRecordings(values, () => {
         this.setState({loading: false, mode: APP_MODES.COMPLETION_PAGE})
       });
-    }
-    else {
+    } else {
       this.setState({mode: APP_MODES.COMPLETION_PAGE});
     }
   }

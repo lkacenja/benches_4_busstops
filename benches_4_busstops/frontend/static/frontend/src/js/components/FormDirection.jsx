@@ -17,26 +17,28 @@ class FormDirection extends React.Component {
     return (
       <Form onSubmit={this.handleSubmit}>
         <h2>Direction</h2>
-        <Radio
-          id="direction-outbound"
-          name="direction"
-          label="Outbound"
-          value="0"
-          labelDescription="Away from the bus station"
-          checked={this.state.direction === "0"}
-          tile
-          onChange={this.handleChange}
-        />
-        <Radio
-          id="direction-inbound"
-          name="direction"
-          label="Inbound"
-          value="1"
-          labelDescription="Toward the bus station"
-          checked={this.state.direction === "1"}
-          tile
-          onChange={this.handleChange}
-        />
+        <div className="margin-bottom-3">
+          <Radio
+            id="direction-outbound"
+            name="direction"
+            label="Outbound"
+            value="0"
+            labelDescription="Away from the bus station"
+            checked={this.state.direction === "0"}
+            tile
+            onChange={this.handleChange}
+          />
+          <Radio
+            id="direction-inbound"
+            name="direction"
+            label="Inbound"
+            value="1"
+            labelDescription="Toward the bus station"
+            checked={this.state.direction === "1"}
+            tile
+            onChange={this.handleChange}
+          />
+        </div>
         <Button type="submit">Continue</Button>
       </Form>
     );
