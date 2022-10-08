@@ -7,4 +7,5 @@ def app(request):
         'hcaptcha_site_key': get_env_variable('HCAPTCHA_SITE_KEY'),
         'google_maps_api_key': get_env_variable('GOOGLE_MAPS_API_KEY')
     }
-    return render(request, 'frontend/app.html', context={'secrets': secrets})
+    return render(request, 'frontend/app.html',
+                  context={'secrets': secrets, 'google_analytics_key': get_env_variable('GOOGLE_ANALYTICS_KEY')})

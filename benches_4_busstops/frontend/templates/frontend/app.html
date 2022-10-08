@@ -1,16 +1,29 @@
 {% load static %}
 
 <html lang="">
-    <head>
-        <title>Benches 4 Bus Stops</title>
-        <link rel="icon" type="image/png" href="{% static 'frontend/dist/images/favicon.png' %}">
-        <link rel="stylesheet" href="{% static 'frontend/dist/css/main.css' %}">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-    </head>
-    <body>
-        <div id="app-container" class="grid-container margin-top-3"></div>
-        {{ secrets|json_script:"secrets" }}
-        <script src="{% static 'frontend/dist/js/bundle.js' %}"></script>
-        <noscript>Your browser does not support JavaScript!</noscript>
-    </body>
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C6SSQ4PWF4"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+
+      gtag('js', new Date());
+
+      gtag('config', '{{ google_analytics_key }}');
+    </script>
+    <title>Benches 4 Bus Stops</title>
+    <link rel="icon" type="image/png" href="{% static 'frontend/dist/images/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'frontend/dist/css/main.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+</head>
+<body>
+<div id="app-container" class="grid-container margin-top-3"></div>
+{{ secrets|json_script:"secrets" }}
+<script src="{% static 'frontend/dist/js/bundle.js' %}"></script>
+<noscript>Your browser does not support JavaScript!</noscript>
+</body>
 </html>
