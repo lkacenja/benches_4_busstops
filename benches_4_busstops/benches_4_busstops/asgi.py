@@ -1,5 +1,5 @@
 """
-ASGI config for bustops project.
+ASGI config for the Benches 4 Bus Stops project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

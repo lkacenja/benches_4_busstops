@@ -1,5 +1,5 @@
 """
-WSGI config for bustops project.
+WSGI config for the Benches 4 Bus Stops project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

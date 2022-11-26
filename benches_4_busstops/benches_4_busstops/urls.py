@@ -1,5 +1,9 @@
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
+
+"""
+Provides front end and backend urls for our Django app.
+"""
 
 urlpatterns = [
     path('', include('backend.urls')),
