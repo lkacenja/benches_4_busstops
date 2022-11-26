@@ -1,0 +1,6 @@
+# Copy this file to .env in the application directory.
+HCAPTCHA_SITE_KEY=''
+GOOGLE_MAPS_API_KEY=''
+DJANGO_SECRET_KEY=''
+DATABASE_URL=postgres://postgres@0.0.0.0:5432/busstops
+GOOGLE_ANALYTICS_KEY=''
