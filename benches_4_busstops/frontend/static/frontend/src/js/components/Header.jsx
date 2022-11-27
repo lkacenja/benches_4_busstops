@@ -1,6 +1,21 @@
 import React from "react";
 
+/**
+ * @file
+ * Provides a static header component.
+ */
+
+/**
+ * A static header component for the app.
+ */
 class Header extends React.Component {
+
+  /**
+   * Implements render().
+   *
+   * @returns {JSX.Element}
+   *  Our header element.
+   */
     render() {
         return (
           <div className="header grid-container padding-x-0">
@@ -11,6 +26,7 @@ class Header extends React.Component {
           </div>
         )
     }
+
 }
 
 export default Header;
