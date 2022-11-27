@@ -11,7 +11,7 @@ The goal is to help activists, artists and communities organize requests to RTD 
 ## The Strategy
 The B4B App provides two ways for users to answer whether a bus stop or station has a bench.
 There is an individual stop logging option and an option for navigating an entire route.
-The former is intended for incidental use. The latter is intended for use, while riding. While in route mode, the application is location enabled and leverages the PostGIS PostgreSQL extension to find the closest bus stop to a riders current location.
+The former is intended for incidental use. The latter is intended for use, while riding. While in route mode, the application is location enabled and leverages the PostGIS PostgreSQL extension to find the closest bus stop to a rider's current location.
 
 To facilitate easy logging, B4B does not require creating any kind of account and is built with minimal and accessible theming. Data is collected anonymously based on hcaptcha session.
 The application implements the [U.S. Web Design System (USWDS)](https://designsystem.digital.gov/), which emphasizes accessibility and mobile performance first.
