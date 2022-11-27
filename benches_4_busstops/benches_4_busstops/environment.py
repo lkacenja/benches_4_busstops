@@ -7,6 +7,20 @@ Environmental utilities.
 """
 
 
+def is_production_environment() -> bool:
+    """
+    Determines whether this is the production environment.
+
+    Returns
+    -------
+    bool
+      Whether this is the production environment.
+    """
+    if os.environ.get('PRODUCTION'):
+        return True
+    return False
+
+
 def get_env_variable(name: str):
     """
     Gets an application variable from the correct place for the current environment.
@@ -24,7 +38,7 @@ def get_env_variable(name: str):
     -------
       The value for the variable.
     """
-    if os.environ.get('PRODUCTION'):
+    if is_production_environment():
         # If we are in production, check for an environmental variable.
         # This works well for Heroku.
         value = os.environ.get(name)
